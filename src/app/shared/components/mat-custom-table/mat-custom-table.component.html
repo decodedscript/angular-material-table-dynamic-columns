@@ -1,0 +1,53 @@
+<div class="table-actionbar">
+  <div class="search-box">
+    <mat-form-field class="example-form-field" appearance="outline">
+      <mat-icon matPrefix>search</mat-icon>
+      <mat-label>Search</mat-label>
+      <input matInput type="text" [(ngModel)]="value" (keyup)="applyFilter($event)">
+      <button *ngIf="value" matSuffix mat-icon-button aria-label="Clear" (click)="value=''">
+        <mat-icon>close</mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
+  <div class="action-box">
+    <button color="warn" mat-mini-fab aria-label="Example icon button with a home icon">
+      <mat-icon>delete</mat-icon>
+    </button>
+    <button color="primary" mat-mini-fab aria-label="Example icon button with a home icon">
+      <mat-icon>refresh</mat-icon>
+    </button>
+  </div>
+
+</div>
+<mat-table #table [dataSource]="dataSource" class="mat-elevation-z8" matSort>
+  <!-- checkbox header -->
+  <ng-container matColumnDef="select">
+    <mat-header-cell *matHeaderCellDef>
+      <mat-checkbox color="primary" (change)="$event ? masterToggle() : null"
+        [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()">
+      </mat-checkbox>
+    </mat-header-cell>
+    <mat-cell *cdkCellDef="let row">
+      <mat-checkbox color="primary" (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null"
+        [checked]="selection.isSelected(row)">
+      </mat-checkbox>
+    </mat-cell>
+  </ng-container>
+  <!-- table dynamic columns -->
+  <ng-container *ngFor="let column of columns" [matColumnDef]="column.columnDef">
+    <mat-header-cell *cdkHeaderCellDef mat-sort-header>{{ column.header }}</mat-header-cell>
+    <mat-cell *cdkCellDef="let row">{{ row[column.columnDef] }}</mat-cell>
+  </ng-container>
+
+  <!-- table action column -->
+  <ng-container matColumnDef="action">
+    <mat-header-cell *matHeaderCellDef>Action</mat-header-cell>
+    <mat-cell *matCellDef="let element" action-buttons [value]="element" (buttonAction)="onTableAction($event)">
+      {{ element.weight }}
+    </mat-cell>
+  </ng-container>
+  <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+  <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+</mat-table>
+<!-- table pagination -->
+<mat-paginator [pageSizeOptions]="[10, 20]" showFirstLastButtons></mat-paginator>
